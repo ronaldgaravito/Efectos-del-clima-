@@ -32,14 +32,36 @@ function Scene({ currentWeather, weatherData }) {
     }))
   }, [])
 
-  // Generate birds
+  // Generate birds (more and better positioned)
   const birds = useMemo(() => {
-    return Array.from({ length: 5 }, (_, i) => ({
+    return Array.from({ length: 8 }, (_, i) => ({
       id: i,
-      top: `${8 + Math.random() * 25}%`,
-      left: `${10 + Math.random() * 70}%`,
-      delay: `${i * 0.2}s`,
-      duration: `${15 + Math.random() * 10}s`,
+      top: `${5 + Math.random() * 30}%`,
+      left: `${-5 + Math.random() * 80}%`,
+      flapDelay: `${Math.random() * 0.3}s`,
+      flyDuration: `${18 + Math.random() * 15}s`,
+      flyDelay: `${i * 2.5}s`,
+      scale: 0.7 + Math.random() * 0.6,
+    }))
+  }, [])
+
+  // Generate butterflies
+  const butterflies = useMemo(() => {
+    const colors = [
+      ['#ff6b6b', '#ff8e8e'], // red
+      ['#ffd93d', '#ffe066'], // yellow
+      ['#74b9ff', '#a8d8ff'], // blue
+      ['#a29bfe', '#c8c3ff'], // purple
+      ['#fd79a8', '#ff9fc3'], // pink
+    ]
+    return Array.from({ length: 4 }, (_, i) => ({
+      id: i,
+      left: `${15 + i * 20}%`,
+      top: `${20 + Math.random() * 40}%`,
+      color: colors[i % colors.length],
+      duration: `${6 + Math.random() * 4}s`,
+      delay: `${i * 1.5}s`,
+      scale: 0.8 + Math.random() * 0.4,
     }))
   }, [])
 
@@ -92,21 +114,38 @@ function Scene({ currentWeather, weatherData }) {
   }, [])
 
   // Generate puddles
-  const puddles = useMemo(() => {
-    return [
-      { id: 1, bottom: '20%', left: '15%', width: '80px', height: '20px' },
-      { id: 2, bottom: '15%', left: '55%', width: '100px', height: '25px' },
-      { id: 3, bottom: '25%', right: '20%', width: '60px', height: '15px' },
-    ]
-  }, [])
+  const puddles = useMemo(() => [
+    { id: 1, bottom: '20%', left: '15%', width: '80px', height: '20px' },
+    { id: 2, bottom: '15%', left: '55%', width: '100px', height: '25px' },
+    { id: 3, bottom: '25%', right: '20%', width: '60px', height: '15px' },
+  ], [])
 
   // Generate flowers
   const flowers = useMemo(() => {
-    const colors = ['#ff6b6b', '#ffd93d', '#ff8e53', '#a8e6cf', '#ff6eb4']
-    return Array.from({ length: 10 }, (_, i) => ({
+    const colors = ['#ff6b6b', '#ffd93d', '#ff8e53', '#a8e6cf', '#ff6eb4', '#74b9ff', '#fd79a8']
+    return Array.from({ length: 14 }, (_, i) => ({
       id: i,
-      left: `${5 + i * 10}%`,
+      left: `${3 + i * 7}%`,
       color: colors[i % colors.length],
+      delay: `${i * 0.3}s`,
+    }))
+  }, [])
+
+  // Generate grass blades
+  const grassBlades = useMemo(() => {
+    return Array.from({ length: 60 }, (_, i) => ({
+      id: i,
+      left: `${(i / 60) * 100}%`,
+      height: `${10 + Math.random() * 15}px`,
+      delay: `${Math.random() * 3}s`,
+    }))
+  }, [])
+
+  // Generate fence posts and rails
+  const fencePosts = useMemo(() => {
+    return Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      left: `${3 + i * 6}%`,
     }))
   }, [])
 
@@ -149,6 +188,7 @@ function Scene({ currentWeather, weatherData }) {
 
   const treeClass = isTornado ? 'strong-wind' : (isStorm ? 'wind-blow' : '')
   const treeLeavesClass = isSnow ? 'snow-covered' : (isDark ? 'dark' : '')
+  const hillClass = isSnow ? 'snow-hill' : (isDark ? 'dark' : '')
 
   return (
     <main className="scene-container">
@@ -158,20 +198,32 @@ function Scene({ currentWeather, weatherData }) {
       {/* Ground */}
       <div className={`ground ${currentWeather} ${isEarthquake ? 'earthquake-shake' : ''}`} />
 
+      {/* Hills (videogame parallax) */}
+      <div className="hills-container">
+        <div className={`hill hill-1 ${hillClass}`} />
+        <div className={`hill hill-2 ${hillClass}`} />
+        <div className={`hill hill-3 ${hillClass}`} />
+      </div>
+
       {/* Weather Label */}
       <div className="weather-label">
         <span className="weather-label-icon">{weatherData?.icon}</span>
         <span className="weather-label-text">{weatherData?.name}</span>
       </div>
 
-      {/* Sun */}
+      {/* Sun (improved with face) */}
       <div className={`sun ${isSunny ? 'visible' : ''}`}>
+        <div className="sun-face">
+          <div className="sun-eye left" />
+          <div className="sun-eye right" />
+          <div className="sun-mouth" />
+        </div>
         <div className="sun-rays">
-          {Array.from({ length: 12 }, (_, i) => (
+          {Array.from({ length: 16 }, (_, i) => (
             <div
               key={i}
-              className="sun-ray"
-              style={{ transform: `rotate(${i * 30}deg)` }}
+              className={`sun-ray ${i % 2 === 0 ? 'long' : ''}`}
+              style={{ transform: `rotate(${i * 22.5}deg)` }}
             />
           ))}
         </div>
@@ -191,30 +243,88 @@ function Scene({ currentWeather, weatherData }) {
       <div className={`cloud cloud-1 ${isStorm ? 'visible dark-storm' : ''}`} style={{ top: '5%' }} />
       <div className={`cloud cloud-2 ${isStorm ? 'visible dark-storm' : ''}`} style={{ top: '3%' }} />
 
-      {/* Birds */}
+      {/* Birds (improved) */}
       <div className={`birds-container ${isSunny ? 'visible' : ''}`}>
         {birds.map((bird) => (
           <div
             key={bird.id}
-            className="bird"
+            className="bird bird-fly"
             style={{
               top: bird.top,
               left: bird.left,
-              animation: `cloudFloat ${bird.duration} linear infinite`,
-              animationDelay: bird.delay,
+              animationDuration: bird.flyDuration,
+              animationDelay: bird.flyDelay,
+              transform: `scale(${bird.scale})`,
             }}
           >
-            <div className="bird-wing left" style={{ animationDelay: bird.delay }} />
-            <div className="bird-wing right" style={{ animationDelay: bird.delay }} />
+            <div className="bird-body" />
+            <div className="bird-wing left" style={{ animationDelay: bird.flapDelay }} />
+            <div className="bird-wing right" style={{ animationDelay: bird.flapDelay }} />
           </div>
         ))}
+      </div>
+
+      {/* Butterflies (sunny only) */}
+      <div className={`butterflies-container ${isSunny ? 'visible' : ''}`}>
+        {butterflies.map((b) => (
+          <div
+            key={b.id}
+            className="butterfly"
+            style={{
+              left: b.left,
+              top: b.top,
+              animationDuration: b.duration,
+              animationDelay: b.delay,
+              transform: `scale(${b.scale})`,
+            }}
+          >
+            <div
+              className="butterfly-wing left"
+              style={{ background: b.color[0] }}
+            />
+            <div
+              className="butterfly-wing right"
+              style={{ background: b.color[1] }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Grass blades (sunny) */}
+      <div className={`grass-container ${isSunny ? 'visible' : ''}`}>
+        {grassBlades.map((blade) => (
+          <div
+            key={blade.id}
+            className="grass-blade"
+            style={{
+              left: blade.left,
+              height: blade.height,
+              animationDelay: blade.delay,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Fence (sunny) */}
+      <div className={`fence-container ${isSunny ? 'visible' : ''}`}>
+        {fencePosts.map((post) => (
+          <div key={post.id} className="fence-post" style={{ left: post.left }} />
+        ))}
+        <div className="fence-rail fence-rail-top" style={{ left: '3%', width: '45%' }} />
+        <div className="fence-rail fence-rail-bottom" style={{ left: '3%', width: '45%' }} />
+        <div className="fence-rail fence-rail-top" style={{ right: '3%', width: '30%' }} />
+        <div className="fence-rail fence-rail-bottom" style={{ right: '3%', width: '30%' }} />
       </div>
 
       {/* Flowers (sunny) */}
       <div className={`flowers-container ${isSunny ? 'visible' : ''}`}>
         {flowers.map((flower) => (
-          <div key={flower.id} className="flower" style={{ left: flower.left }}>
-            <div className="flower-head" style={{ background: flower.color }} />
+          <div
+            key={flower.id}
+            className="flower"
+            style={{ left: flower.left, animationDelay: flower.delay }}
+          >
+            <div className="flower-head" style={{ background: `radial-gradient(circle, ${flower.color}, ${flower.color}dd)` }} />
             <div className="flower-stem" />
           </div>
         ))}
@@ -366,7 +476,7 @@ function Scene({ currentWeather, weatherData }) {
         ))}
       </div>
 
-      {/* Trees */}
+      {/* Trees (improved) */}
       <div className={`tree tree-1 ${treeClass}`}>
         <div className={`tree-leaves ${treeLeavesClass}`} />
         <div className="tree-trunk" />
