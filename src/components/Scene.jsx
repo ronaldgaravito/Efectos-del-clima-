@@ -223,7 +223,7 @@ function Scene({ currentWeather, weatherData }) {
             <div
               key={i}
               className={`sun-ray ${i % 2 === 0 ? 'long' : ''}`}
-              style={{ transform: `rotate(${i * 22.5}deg)` }}
+              style={{ transform: `rotate(${i * 22.5}deg) translateY(60px)` }}
             />
           ))}
         </div>
@@ -476,16 +476,20 @@ function Scene({ currentWeather, weatherData }) {
         ))}
       </div>
 
-      {/* Trees (improved) */}
-      <div className={`tree tree-1 ${treeClass}`}>
+      {/* Trees (improved depth and variety) */}
+      <div className={`tree tree-1 tree-lg ${treeClass}`}>
         <div className={`tree-leaves ${treeLeavesClass}`} />
         <div className="tree-trunk" />
       </div>
-      <div className={`tree tree-2 ${treeClass}`}>
+      <div className={`tree tree-2 tree-lg ${treeClass}`}>
         <div className={`tree-leaves ${treeLeavesClass}`} />
         <div className="tree-trunk" />
       </div>
-      <div className={`tree tree-3 ${treeClass}`}>
+      <div className={`tree tree-3 tree-sm ${treeClass}`}>
+        <div className={`tree-leaves ${treeLeavesClass}`} />
+        <div className="tree-trunk" />
+      </div>
+      <div className={`tree tree-4 tree-sm ${treeClass}`}>
         <div className={`tree-leaves ${treeLeavesClass}`} />
         <div className="tree-trunk" />
       </div>
