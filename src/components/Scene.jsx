@@ -6,16 +6,17 @@ function Scene({ currentWeather, weatherData }) {
   const [lightningBolts, setLightningBolts] = useState([])
   const lightningInterval = useRef(null)
 
-  // Generate raindrops
+  // Generate raindrops — more drops, varied lengths for realism
   const raindrops = useMemo(() => {
-    const count = currentWeather === 'storm' ? 200 : 100
+    const count = currentWeather === 'storm' ? 280 : 160
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
-      height: `${15 + Math.random() * 25}px`,
-      duration: `${0.4 + Math.random() * 0.4}s`,
-      delay: `${Math.random() * 2}s`,
-      opacity: 0.3 + Math.random() * 0.5,
+      height: `${20 + Math.random() * 45}px`,
+      duration: `${0.35 + Math.random() * 0.35}s`,
+      delay: `${Math.random() * 2.5}s`,
+      opacity: 0.35 + Math.random() * 0.55,
+      blur: Math.random() > 0.7 ? '0.6px' : '0px',
     }))
   }, [currentWeather])
 
@@ -113,12 +114,34 @@ function Scene({ currentWeather, weatherData }) {
     }))
   }, [])
 
-  // Generate puddles
+  // Generate puddles with ripple rings
   const puddles = useMemo(() => [
-    { id: 1, bottom: '20%', left: '15%', width: '80px', height: '20px' },
-    { id: 2, bottom: '15%', left: '55%', width: '100px', height: '25px' },
-    { id: 3, bottom: '25%', right: '20%', width: '60px', height: '15px' },
+    { id: 1, bottom: '19%', left: '12%',  width: '100px', height: '26px', ripples: [{ d: '2.8s', dl: '0s' }, { d: '2.8s', dl: '0.9s' }, { d: '2.8s', dl: '1.8s' }] },
+    { id: 2, bottom: '13%', left: '52%',  width: '130px', height: '32px', ripples: [{ d: '3.2s', dl: '0s' }, { d: '3.2s', dl: '1.1s' }, { d: '3.2s', dl: '2.2s' }] },
+    { id: 3, bottom: '23%', right: '18%', width: '80px',  height: '20px', ripples: [{ d: '2.5s', dl: '0s' }, { d: '2.5s', dl: '0.8s' }, { d: '2.5s', dl: '1.6s' }] },
+    { id: 4, bottom: '10%', left: '35%',  width: '70px',  height: '17px', ripples: [{ d: '3s',   dl: '0s' }, { d: '3s',   dl: '1s'   }, { d: '3s',   dl: '2s'   }] },
   ], [])
+
+  // Generate mist streaks for rain atmosphere
+  const mistStreaks = useMemo(() => {
+    return Array.from({ length: 6 }, (_, i) => ({
+      id: i,
+      top: `${20 + i * 10}%`,
+      duration: `${8 + Math.random() * 6}s`,
+      delay: `${i * 1.5}s`,
+      opacity: 0.5 + Math.random() * 0.5,
+    }))
+  }, [])
+
+  // Generate splashes at ground level
+  const splashes = useMemo(() => {
+    return Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      left: `${2 + Math.random() * 96}%`,
+      duration: `${0.5 + Math.random() * 0.5}s`,
+      delay: `${Math.random() * 3}s`,
+    }))
+  }, [])
 
   // Generate flowers
   const flowers = useMemo(() => {
@@ -342,12 +365,32 @@ function Scene({ currentWeather, weatherData }) {
               animationDuration: drop.duration,
               animationDelay: drop.delay,
               opacity: drop.opacity,
+              filter: drop.blur !== '0px' ? `blur(${drop.blur})` : undefined,
             }}
           />
         ))}
       </div>
 
-      {/* Puddles */}
+      {/* Atmospheric fog / mist layer */}
+      <div className={`rain-mist ${isRainy ? 'visible' : ''}`} />
+
+      {/* Drifting mist streaks */}
+      <div className={`rain-mist-streaks ${isRainy ? 'visible' : ''}`}>
+        {mistStreaks.map((streak) => (
+          <div
+            key={streak.id}
+            className="mist-streak"
+            style={{
+              top: streak.top,
+              animationDuration: streak.duration,
+              animationDelay: streak.delay,
+              opacity: streak.opacity,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Puddles with ripple rings */}
       <div className={`puddles-container ${isRainy ? 'visible' : ''}`}>
         {puddles.map((puddle) => (
           <div
@@ -359,6 +402,34 @@ function Scene({ currentWeather, weatherData }) {
               right: puddle.right,
               width: puddle.width,
               height: puddle.height,
+            }}
+          >
+            {puddle.ripples.map((r, idx) => (
+              <div
+                key={idx}
+                className="puddle-ripple"
+                style={{
+                  width: puddle.width,
+                  height: puddle.height,
+                  animationDuration: r.d,
+                  animationDelay: r.dl,
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Rain splashes at ground level */}
+      <div className={`splash-container ${isRainy ? 'visible' : ''}`}>
+        {splashes.map((s) => (
+          <div
+            key={s.id}
+            className="splash"
+            style={{
+              left: s.left,
+              animationDuration: s.duration,
+              animationDelay: s.delay,
             }}
           />
         ))}
