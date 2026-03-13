@@ -1,1 +1,0 @@
-# Efectos-del-clima-
