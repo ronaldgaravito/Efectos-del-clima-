@@ -66,29 +66,40 @@ function Scene({ currentWeather, weatherData }) {
     }))
   }, [])
 
-  // Generate tornado rings
+  // Generate tornado rings — more rings, with dramatic size increase
   const tornadoRings = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => ({
+    return Array.from({ length: 18 }, (_, i) => ({
       id: i,
-      top: `${i * 8}%`,
-      width: `${20 + i * 14}px`,
-      height: `${10 + i * 5}px`,
-      speed: `${0.6 + i * 0.08}s`,
-      opacity: 0.3 + (i / 12) * 0.4,
+      top: `${i * 5.5}%`,
+      width: `${14 + i * 17}px`,
+      height: `${8 + i * 7}px`,
+      speed: `${0.4 + i * 0.06}s`,
+      opacity: 0.25 + (i / 18) * 0.55,
     }))
   }, [])
 
-  // Generate debris
-  const debris = useMemo(() => {
-    return Array.from({ length: 15 }, (_, i) => ({
+  // Wall cloud rotation bands
+  const wallCloudBands = useMemo(() => {
+    return Array.from({ length: 5 }, (_, i) => ({
       id: i,
-      left: `${20 + Math.random() * 60}%`,
-      top: `${20 + Math.random() * 50}%`,
-      width: `${4 + Math.random() * 8}px`,
-      height: `${2 + Math.random() * 4}px`,
-      duration: `${1.5 + Math.random() * 2}s`,
-      delay: `${Math.random() * 2}s`,
-      color: ['#8B6914', '#6b3410', '#4a4a4a', '#8B4513'][Math.floor(Math.random() * 4)],
+      bottom: `${5 + i * 14}%`,
+      duration: `${12 + i * 4}s`,
+      delay: `${i * 1.8}s`,
+      opacity: 0.5 + i * 0.1,
+    }))
+  }, [])
+
+  // Generate debris — varied sizes, positioned near tornado zone (right side)
+  const debris = useMemo(() => {
+    return Array.from({ length: 22 }, (_, i) => ({
+      id: i,
+      left: `${52 + Math.random() * 28}%`,
+      top: `${28 + Math.random() * 40}%`,
+      width: `${3 + Math.random() * 10}px`,
+      height: `${2 + Math.random() * 6}px`,
+      duration: `${1.8 + Math.random() * 2.5}s`,
+      delay: `${Math.random() * 2.5}s`,
+      color: ['#8B6914', '#6b3410', '#4a4a4a', '#8B4513', '#a07840', '#5a3820'][Math.floor(Math.random() * 6)],
     }))
   }, [])
 
@@ -469,8 +480,31 @@ function Scene({ currentWeather, weatherData }) {
       </div>
       <div className={`snow-ground ${isSnow ? 'visible' : ''}`} />
 
-      {/* Tornado */}
+      {/* === TORNADO SCENE === */}
+
+      {/* Overlay verde-amarillo apocaliptico sobre el cielo */}
+      <div className={`tornado-sky-overlay ${isTornado ? 'visible' : ''}`} />
+
+      {/* Wall Cloud — nube de pared oscura que ocupa todo el ancho superior */}
+      <div className={`wall-cloud ${isTornado ? 'visible' : ''}`}>
+        <div className="wall-cloud-mass" />
+        {wallCloudBands.map((band) => (
+          <div
+            key={band.id}
+            className="wall-cloud-band"
+            style={{
+              bottom: band.bottom,
+              animationDuration: band.duration,
+              animationDelay: band.delay,
+              opacity: band.opacity,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Tornado funnel + effects */}
       <div className={`tornado-container ${isTornado ? 'visible' : ''}`}>
+        <div className="tornado-atmosphere" />
         <div className="tornado-funnel">
           {tornadoRings.map((ring) => (
             <div
@@ -486,6 +520,9 @@ function Scene({ currentWeather, weatherData }) {
             />
           ))}
         </div>
+        <div className="tornado-tail" />
+        <div className="tornado-ground-vortex" />
+        <div className="tornado-dirt-cloud" />
       </div>
 
       {/* Flying debris (tornado) */}
